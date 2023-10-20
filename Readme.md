@@ -13,7 +13,8 @@ So I check the http first and found nothing in the website. Then I decided to ch
 
 # FTP login
 I tried to login to the ftp with anonymous and it worked.
-!
+![ftp-login](images/ftp-login.png)
+
 
 then i got a file name *read_me.txt*
 
@@ -26,13 +27,17 @@ Bill
 ## HTTP hidden directory discovery
 So i know that there's a hidden directory called */iDONTcare* in http server.
 When I check it, I got a text message.
-!
+![http-idc](images/http-idc.png)
 
 It look a little suspicious so I use CTRL+U to view the source code and I got another hidden directory.
 
-!
+![http-idc-sc](images/http-idc-sc.png)
+
+
 But when i access the /s3cr3t folder it's just a blank page.
-!
+![http-s3cr3t](images/http-s3cr3t.png)
+
+
 So I decided to run gobuster and check it.
 and it has a hidden file name *mysecret*.
 When I open it, It say:
@@ -44,7 +49,7 @@ and there is your ssh key also
 So I got another hidden directory.
 When I check it, it's also a blank screen. I tried gobuster and it isn't working too.
 So since I was looking for the id_rsa(user for ssh login) file I enter /V2S7jjDrk6Ogjj1/id_rsa and boom, I've got the ssh login key.
-!
+![http-hidden-id-rsa](images/http-hidden-id-rsa.png)
 
 ## SSH login
 
@@ -54,10 +59,10 @@ I change the permission of the file to 600 and then I tried to login with
 ssh -i id_rsa bill@machine_ip
 ```
 But it said it need a passphrase.
-!
+![ssh-fail](images/ssh-login-fail.png)
 
 So i used ssh2john and cracked the passphrase.
-!
+![ssh-crack](images/ssh-key-crak.png)
 
 And the passphrase is *babygurl*.
 
@@ -68,30 +73,34 @@ Now I login to ssh successfully.
 First I tried **ls -la** but there's nothing there.
 I know there is another user name **Mary**, so i change directory to /home .
 And there it is one for Bill and one for Mary.
-!
+![ls-home](images/ls-home.png)
 
 I change dirctory to /home/mary and I found three files.
-!
+![ls-mary](images/ls-mary.png)
+
 I used the command
 ```
 cat user.txt
 ```
 to try and get the user flag, but it said permission denied.
+![cat-user](images/cat-user.png)
+
 But when i *cat* the other two files, It's okay.
 The first one *backup.sh* have:
-!
+![cat-backup](images/cat-backup.png)
+
 
 and the second one *check_s3cr3t* have:
-!
+![cat-check](images/cat-check.png)
 
 So there is a secret directory in the system called **s3cr3t**.
 If you remember in *backup.sh*, it save files from /var/www/html/ to /s3cr3t/backup.zip
 So I go to /s3cr3t and found nothing but backup.zip.
 And I tought maybe there is an hidden file.
 So I used ls -la and there is a file name **.hidden**
-!
+![ls-s3cr3t](images/ls-s3cr3t.png)
 Inside the file there is
-!
+![cat-s3cr3t](images/cat-s3cr3t.png)
 
 We have mary's password now.
 So let's login to mary account by
@@ -110,13 +119,13 @@ So I check the crontab with
 cat /etc/crontab
 ```
 
-!
+![cat-crontab](images/cat-crontab.png)
 
 as we can see, there is a cron job run by root and the file is in mary home directory.
 So let's edit the *backup.sh* file.
-!
+![edit-backup](images/edit-backup.png)
 I edited it and after a minute the the */bin/bash* will have a suid and we can login as root.
-!
+![ls-bash](images/ls-bash.png)
 
 Now our bash file have an suid bit so let's login as root by
 ```
